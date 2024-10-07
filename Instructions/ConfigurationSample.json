@@ -1,0 +1,16 @@
+{
+  "CacheSettings": {
+    "Redis": {
+      "ConnectionString": "localhost:6379",
+      "DefaultTimeout": 10
+    },
+    "Memcached": {
+      "ServerAddress": "127.0.0.1",
+      "ServerPort": "11211",
+      "DefaultTimeout": 10
+    },
+    "InMemory": {
+      "DefaultTimeout": 10
+    }
+  }
+}
