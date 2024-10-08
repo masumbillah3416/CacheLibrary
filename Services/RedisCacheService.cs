@@ -1,4 +1,5 @@
-﻿using CacheLibrary.Interfaces;
+﻿using CacheLibrary.Helper;
+using CacheLibrary.Interfaces;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -28,6 +29,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing a boolean indicating whether the key exists.</returns>
         public async Task<bool> ContainsAsync(string key)
         {
+            CacheHelper.ValidateKey(key);
             return await _database.KeyExistsAsync(key);
         }
 
@@ -39,6 +41,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing the value associated with the key, or default if the key does not exist.</returns>
         public async Task<T?> GetAsync<T>(string key)
         {
+            CacheHelper.ValidateKey(key);
             var value = await _database.StringGetAsync(key);
             return value.IsNull ? default : JsonSerializer.Deserialize<T>(value.ToString());
         }
@@ -50,6 +53,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task RemoveAsync(string key)
         {
+            CacheHelper.ValidateKey(key);
             await _database.KeyDeleteAsync(key);
         }
 
@@ -90,6 +94,7 @@ namespace CacheLibrary.Services
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the expiration type is not recognized.</exception>
         public async Task SetAsync<T>(string key, T item, TimeSpan expiration, ExpirationType expirationType)
         {
+            CacheHelper.ValidateKey(key);
             var value = JsonSerializer.Serialize(item);
             switch (expirationType)
             {

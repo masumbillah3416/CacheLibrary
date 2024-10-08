@@ -1,4 +1,5 @@
-﻿using CacheLibrary.Interfaces;
+﻿using CacheLibrary.Helper;
+using CacheLibrary.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 
@@ -27,7 +28,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing a boolean indicating whether the key exists.</returns>
         public Task<bool> ContainsAsync(string key)
         {
-            ValidateKey(key);
+            CacheHelper.ValidateKey(key);
             return Task.FromResult(_memoryCache.TryGetValue(key, out _));
         }
 
@@ -39,7 +40,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing the value associated with the key, or default if the key does not exist.</returns>
         public Task<T?> GetAsync<T>(string key)
         {
-            ValidateKey(key);
+            CacheHelper.ValidateKey(key);
             T? value = _memoryCache.TryGetValue(key, out T? result) ? result : default;
             return Task.FromResult(value);
         }
@@ -51,7 +52,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation.</returns>
         public Task RemoveAsync(string key)
         {
-            ValidateKey(key);
+            CacheHelper.ValidateKey(key);
             _memoryCache.Remove(key);
             return Task.CompletedTask;
         }
@@ -93,7 +94,7 @@ namespace CacheLibrary.Services
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the expiration type is not recognized.</exception>
         public Task SetAsync<T>(string key, T item, TimeSpan expiration, ExpirationType expirationType)
         {
-            ValidateKey(key);
+            CacheHelper.ValidateKey(key);
             var cacheEntryOptions = GetMemoryCacheOption(expiration, expirationType);
             _memoryCache.Set(key, item, cacheEntryOptions);
             return Task.CompletedTask;
@@ -101,18 +102,6 @@ namespace CacheLibrary.Services
 
         #region Private Methods
 
-        /// <summary>
-        /// Validates the specified cache key.
-        /// </summary>
-        /// <param name="key">The key to validate.</param>
-        /// <exception cref="ArgumentException">Thrown when the key is null or empty.</exception>
-        private void ValidateKey(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-            }
-        }
 
         /// <summary>
         /// Gets the memory cache options based on the expiration time and type.

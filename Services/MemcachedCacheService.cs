@@ -1,4 +1,5 @@
-﻿using CacheLibrary.Interfaces;
+﻿using CacheLibrary.Helper;
+using CacheLibrary.Interfaces;
 using Enyim.Caching;
 using Enyim.Caching.Memcached;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing a boolean indicating whether the key exists.</returns>
         public async Task<bool> ContainsAsync(string key)
         {
+            CacheHelper.ValidateKey(key);
             var value = await _memcachedClient.GetAsync<object>(key);
             return value != null;
         }
@@ -40,6 +42,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation, containing the value associated with the key, or default if the key does not exist.</returns>
         public async Task<T?> GetAsync<T>(string key)
         {
+            CacheHelper.ValidateKey(key);
             var result = await _memcachedClient.GetAsync<T>(key);
             return result.HasValue ? result.Value : default;
         }
@@ -51,6 +54,7 @@ namespace CacheLibrary.Services
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task RemoveAsync(string key)
         {
+            CacheHelper.ValidateKey(key);
             await _memcachedClient.RemoveAsync(key);
         }
 
@@ -91,6 +95,7 @@ namespace CacheLibrary.Services
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the expiration type is not recognized.</exception>
         public async Task SetAsync<T>(string key, T item, TimeSpan expiration, ExpirationType expirationType)
         {
+            CacheHelper.ValidateKey(key);
             switch (expirationType)
             {
                 case ExpirationType.Absolute:
